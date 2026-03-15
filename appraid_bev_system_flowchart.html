@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android-BEV-App — System Flowchart</title>
+<style>
+  :root {
+    --bg:#ffffff;--bg2:#f5f4f0;--text:#1a1a18;--text2:#5f5e5a;
+    --border:rgba(0,0,0,0.15);--border2:rgba(0,0,0,0.30);
+  }
+  @media(prefers-color-scheme:dark){
+    :root{--bg:#1c1c1a;--bg2:#2c2c2a;--text:#e8e6de;--text2:#9c9a92;
+    --border:rgba(255,255,255,0.15);--border2:rgba(255,255,255,0.30);}
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;}
+  h1{font-size:20px;font-weight:500;margin-bottom:4px;}
+  p.sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;overflow-x:auto;}
+  .c-teal>rect,.c-teal>circle{fill:#E1F5EE;stroke:#0F6E56;}
+  .c-teal .th{fill:#085041;}.c-teal .ts{fill:#0F6E56;}
+  .c-purple>rect,.c-purple>circle{fill:#EEEDFE;stroke:#534AB7;}
+  .c-purple .th{fill:#3C3489;}.c-purple .ts{fill:#534AB7;}
+  .c-amber>rect,.c-amber>circle{fill:#FAEEDA;stroke:#854F0B;}
+  .c-amber .th{fill:#633806;}.c-amber .ts{fill:#854F0B;}
+  .c-coral>rect,.c-coral>circle{fill:#FAECE7;stroke:#993C1D;}
+  .c-coral .th{fill:#712B13;}.c-coral .ts{fill:#993C1D;}
+  .c-gray>rect,.c-gray>circle{fill:#F1EFE8;stroke:#5F5E5A;}
+  .c-gray .th{fill:#2C2C2A;}.c-gray .ts{fill:#5F5E5A;}
+  @media(prefers-color-scheme:dark){
+    .c-teal>rect,.c-teal>circle{fill:#085041;stroke:#5DCAA5;}
+    .c-teal .th{fill:#9FE1CB;}.c-teal .ts{fill:#5DCAA5;}
+    .c-purple>rect,.c-purple>circle{fill:#3C3489;stroke:#AFA9EC;}
+    .c-purple .th{fill:#CECBF6;}.c-purple .ts{fill:#AFA9EC;}
+    .c-amber>rect,.c-amber>circle{fill:#633806;stroke:#EF9F27;}
+    .c-amber .th{fill:#FAC775;}.c-amber .ts{fill:#EF9F27;}
+    .c-coral>rect,.c-coral>circle{fill:#712B13;stroke:#F0997B;}
+    .c-coral .th{fill:#F5C4B3;}.c-coral .ts{fill:#F0997B;}
+    .c-gray>rect,.c-gray>circle{fill:#2C2C2A;stroke:#B4B2A9;}
+    .c-gray .th{fill:#D3D1C7;}.c-gray .ts{fill:#B4B2A9;}
+  }
+  .th{font-family:system-ui,sans-serif;font-size:14px;font-weight:500;}
+  .ts{font-family:system-ui,sans-serif;font-size:12px;font-weight:400;}
+  .arr{stroke:var(--border2);stroke-width:1.5;fill:none;}
+  text{fill:var(--text2);}
+  p.foot{margin-top:16px;font-size:12px;color:var(--text2);}
+</style>
+</head>
+<body>
+<h1>Android-BEV-App — System Flowchart</h1>
+<p class="sub">Full pipeline from fisheye camera inputs to BEV output · Pure Kotlin · Jetson Nano / Android TV</p>
+<div class="card">
+<svg width="100%" viewBox="0 0 680 1780" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<text class="ts" x="340" y="26" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">SYSTEM INPUTS</text>
+<line x1="40" y1="32" x2="290" y2="32" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="390" y1="32" x2="640" y2="32" stroke="var(--border)" stroke-width="0.5"/>
+<g class="c-teal"><rect x="40" y="44" width="130" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="105" y="66" text-anchor="middle" dominant-baseline="central">Front camera</text>
+<text class="ts" x="105" y="84" text-anchor="middle" dominant-baseline="central">1280×1080 px</text></g>
+<g class="c-teal"><rect x="182" y="44" width="130" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="247" y="66" text-anchor="middle" dominant-baseline="central">Left camera</text>
+<text class="ts" x="247" y="84" text-anchor="middle" dominant-baseline="central">1280×1080 px</text></g>
+<g class="c-teal"><rect x="324" y="44" width="130" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="389" y="66" text-anchor="middle" dominant-baseline="central">Rear camera</text>
+<text class="ts" x="389" y="84" text-anchor="middle" dominant-baseline="central">1280×1080 px</text></g>
+<g class="c-teal"><rect x="466" y="44" width="130" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="531" y="66" text-anchor="middle" dominant-baseline="central">Right camera</text>
+<text class="ts" x="531" y="84" text-anchor="middle" dominant-baseline="central">1280×1080 px</text></g>
+<line x1="105" y1="100" x2="105" y2="140" class="arr" marker-end="url(#arrow)"/>
+<line x1="247" y1="100" x2="247" y2="140" class="arr" marker-end="url(#arrow)"/>
+<line x1="389" y1="100" x2="389" y2="140" class="arr" marker-end="url(#arrow)"/>
+<line x1="531" y1="100" x2="531" y2="140" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="134" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">MAINACTIVITY — loadImages()</text>
+<g class="c-purple"><rect x="130" y="140" width="420" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="162" text-anchor="middle" dominant-baseline="central">assets.open("bev_images/{cam}/0.png")</text>
+<text class="ts" x="340" y="180" text-anchor="middle" dominant-baseline="central">BitmapFactory.decodeStream → Map&lt;String, Bitmap&gt;</text></g>
+<line x1="340" y1="196" x2="340" y2="236" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="230" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">BEVPROCESSOR — pre-processing (per camera)</text>
+<polygon points="340,240 390,268 340,296 290,268" fill="var(--bg2)" stroke="var(--border2)" stroke-width="0.5"/>
+<text class="ts" x="340" y="265" text-anchor="middle" dominant-baseline="central">size</text>
+<text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">1280×1080?</text>
+<line x1="390" y1="268" x2="490" y2="268" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="442" y="260" text-anchor="middle">yes</text>
+<g class="c-gray"><rect x="490" y="246" width="120" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="550" y="268" text-anchor="middle" dominant-baseline="central">Use as-is</text></g>
+<line x1="290" y1="268" x2="190" y2="268" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="238" y="260" text-anchor="middle">no</text>
+<g class="c-gray"><rect x="40" y="246" width="150" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="115" y="263" text-anchor="middle" dominant-baseline="central">createScaledBitmap</text>
+<text class="ts" x="115" y="280" text-anchor="middle" dominant-baseline="central">to 1280×1080</text></g>
+<line x1="115" y1="290" x2="115" y2="340" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="550" y1="290" x2="550" y2="340" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="115" y1="340" x2="550" y2="340" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="340" y1="340" x2="340" y2="370" class="arr" marker-end="url(#arrow)"/>
+<polygon points="340,372 400,400 340,428 280,400" fill="var(--bg2)" stroke="var(--border2)" stroke-width="0.5"/>
+<text class="ts" x="340" y="396" text-anchor="middle" dominant-baseline="central">front or</text>
+<text class="ts" x="340" y="410" text-anchor="middle" dominant-baseline="central">rear cam?</text>
+<line x1="400" y1="400" x2="500" y2="400" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="452" y="392" text-anchor="middle">yes</text>
+<g class="c-amber"><rect x="500" y="378" width="140" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="570" y="396" text-anchor="middle" dominant-baseline="central">postRotate(180°)</text>
+<text class="ts" x="570" y="412" text-anchor="middle" dominant-baseline="central">rz=180 mount fix</text></g>
+<line x1="280" y1="400" x2="180" y2="400" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="228" y="392" text-anchor="middle">no</text>
+<g class="c-gray"><rect x="40" y="378" width="140" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="110" y="400" text-anchor="middle" dominant-baseline="central">No flip</text>
+<text class="ts" x="110" y="416" text-anchor="middle" dominant-baseline="central">left / right cams</text></g>
+<line x1="110" y1="422" x2="110" y2="460" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="570" y1="422" x2="570" y2="460" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="110" y1="460" x2="570" y2="460" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="340" y1="460" x2="340" y2="490" class="arr" marker-end="url(#arrow)"/>
+<g class="c-gray"><rect x="160" y="490" width="360" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="507" text-anchor="middle" dominant-baseline="central">bitmap.getPixels() → IntArray</text>
+<text class="ts" x="340" y="522" text-anchor="middle" dominant-baseline="central">flat ARGB pixel cache for fast access</text></g>
+<line x1="340" y1="534" x2="340" y2="564" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="558" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">BEVPROCESSOR — buildRotationMatrix() (once per camera, lazy)</text>
+<g class="c-purple"><rect x="80" y="564" width="520" height="68" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="586" text-anchor="middle" dominant-baseline="central">Camera yaw → 3×3 rotation matrix R</text>
+<text class="ts" x="340" y="603" text-anchor="middle" dominant-baseline="central">front=0°  left=270°  rear=180°  right=90°</text>
+<text class="ts" x="340" y="619" text-anchor="middle" dominant-baseline="central">Z-col = optical axis · X-col = cam right · Y-col = cam up</text></g>
+<line x1="340" y1="632" x2="340" y2="662" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="656" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">BEVPROCESSOR — buildBev() main loop  (500×500 = 250 000 iterations)</text>
+<rect x="40" y="662" width="600" height="680" rx="12" fill="none" stroke="var(--border2)" stroke-width="0.5" stroke-dasharray="6 3"/>
+<text class="ts" x="56" y="682" style="font-size:11px">for row 0..500 · for col 0..500 · for cam in {front, left, rear, right}</text>
+<g class="c-teal"><rect x="80" y="692" width="520" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="714" text-anchor="middle" dominant-baseline="central">A  World coordinates</text>
+<text class="ts" x="340" y="731" text-anchor="middle" dominant-baseline="central">worldX = 5 − row×0.02 m  ·  worldY = −5 + col×0.02 m</text></g>
+<line x1="340" y1="748" x2="340" y2="772" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="80" y="772" width="520" height="68" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="794" text-anchor="middle" dominant-baseline="central">B  Camera-space transform</text>
+<text class="ts" x="340" y="811" text-anchor="middle" dominant-baseline="central">dx=worldX  dy=worldY  dz=CAM_HEIGHT(1m)</text>
+<text class="ts" x="340" y="826" text-anchor="middle" dominant-baseline="central">[xc, yc, zc] = R × [dx, dy, dz]</text></g>
+<line x1="340" y1="840" x2="340" y2="864" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="80" y="864" width="520" height="96" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="886" text-anchor="middle" dominant-baseline="central">C  Mei fisheye projection  (ξ = 1.7634)</text>
+<text class="ts" x="340" y="903" text-anchor="middle" dominant-baseline="central">r3d = √(xc²+yc²+zc²)    mzXi = zc/r3d + ξ</text>
+<text class="ts" x="340" y="919" text-anchor="middle" dominant-baseline="central">u = fx·(xc/r3d)/mzXi + cx</text>
+<text class="ts" x="340" y="935" text-anchor="middle" dominant-baseline="central">v = fy·(yc/r3d)/mzXi + cy</text></g>
+<line x1="340" y1="960" x2="340" y2="990" class="arr" marker-end="url(#arrow)"/>
+<polygon points="340,992 400,1018 340,1044 280,1018" fill="var(--bg2)" stroke="var(--border2)" stroke-width="0.5"/>
+<text class="ts" x="340" y="1014" text-anchor="middle" dominant-baseline="central">u,v within</text>
+<text class="ts" x="340" y="1028" text-anchor="middle" dominant-baseline="central">bounds?</text>
+<line x1="280" y1="1018" x2="100" y2="1018" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="190" y="1010" text-anchor="middle">no → skip</text>
+<line x1="400" y1="1018" x2="440" y2="1018" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="440" y1="1018" x2="440" y2="1044" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="448" y="1035" style="font-size:11px">yes</text>
+<g class="c-amber"><rect x="80" y="1044" width="520" height="68" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1066" text-anchor="middle" dominant-baseline="central">D  Blend weight</text>
+<text class="ts" x="340" y="1082" text-anchor="middle" dominant-baseline="central">dist = √(worldX²+worldY²)</text>
+<text class="ts" x="340" y="1097" text-anchor="middle" dominant-baseline="central">cosA = (cos(yaw)·worldX + sin(yaw)·worldY) / dist    w = cosA^1.5 / dist</text></g>
+<line x1="340" y1="1112" x2="340" y2="1136" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="80" y="1136" width="520" height="68" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1158" text-anchor="middle" dominant-baseline="central">E  Bilinear interpolation</text>
+<text class="ts" x="340" y="1175" text-anchor="middle" dominant-baseline="central">u0,v0 = floor(u,v)    du = u−u0    dv = v−v0</text>
+<text class="ts" x="340" y="1190" text-anchor="middle" dominant-baseline="central">colour = c00·(1-du)(1-dv) + c01·du(1-dv) + c10·(1-du)dv + c11·du·dv</text></g>
+<line x1="340" y1="1204" x2="340" y2="1228" class="arr" marker-end="url(#arrow)"/>
+<g class="c-gray"><rect x="80" y="1228" width="520" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1250" text-anchor="middle" dominant-baseline="central">F  Weighted accumulation</text>
+<text class="ts" x="340" y="1267" text-anchor="middle" dominant-baseline="central">bevR[i] += w·R    bevG[i] += w·G    bevB[i] += w·B    totalW[i] += w</text></g>
+<line x1="600" y1="1270" x2="632" y2="1270" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="632" y1="1270" x2="632" y2="712" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="632" y1="712" x2="602" y2="712" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="648" y="990" text-anchor="start" style="font-size:11px">next</text>
+<text class="ts" x="648" y="1003" text-anchor="start" style="font-size:11px">cam /</text>
+<text class="ts" x="648" y="1016" text-anchor="start" style="font-size:11px">pixel</text>
+<line x1="340" y1="1342" x2="340" y2="1382" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="1376" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">BEVPROCESSOR — assemble output bitmap</text>
+<g class="c-purple"><rect x="80" y="1382" width="520" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1404" text-anchor="middle" dominant-baseline="central">Normalise each pixel</text>
+<text class="ts" x="340" y="1421" text-anchor="middle" dominant-baseline="central">rgb = (bevR/totalW, bevG/totalW, bevB/totalW)  clamped 0–255</text></g>
+<line x1="340" y1="1438" x2="340" y2="1468" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="1462" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">BEVPROCESSOR — drawOverlay()</text>
+<g class="c-coral"><rect x="40"  y="1468" width="128" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="104" y="1490" text-anchor="middle" dominant-baseline="central">Car box</text>
+<text class="ts" x="104" y="1508" text-anchor="middle" dominant-baseline="central">+ CAR_Y_OFFSET</text></g>
+<g class="c-coral"><rect x="180" y="1468" width="128" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="244" y="1490" text-anchor="middle" dominant-baseline="central">Forward arrow</text>
+<text class="ts" x="244" y="1508" text-anchor="middle" dominant-baseline="central">rear → front tip</text></g>
+<g class="c-coral"><rect x="320" y="1468" width="128" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="384" y="1490" text-anchor="middle" dominant-baseline="central">2m ring</text>
+<text class="ts" x="384" y="1508" text-anchor="middle" dominant-baseline="central">cyan, at origin</text></g>
+<g class="c-coral"><rect x="460" y="1468" width="128" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="524" y="1490" text-anchor="middle" dominant-baseline="central">4m ring</text>
+<text class="ts" x="524" y="1508" text-anchor="middle" dominant-baseline="central">blue, at origin</text></g>
+<line x1="104" y1="1524" x2="104" y2="1560" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="244" y1="1524" x2="244" y2="1560" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="384" y1="1524" x2="384" y2="1560" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="524" y1="1524" x2="524" y2="1560" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="104" y1="1560" x2="524" y2="1560" stroke="var(--border)" stroke-width="0.5"/>
+<line x1="340" y1="1560" x2="340" y2="1590" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="1584" text-anchor="middle" style="font-weight:500;letter-spacing:.08em">MAINACTIVITY — display &amp; save</text>
+<g class="c-teal"><rect x="80"  y="1590" width="250" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="205" y="1612" text-anchor="middle" dominant-baseline="central">Compose Image()</text>
+<text class="ts" x="205" y="1629" text-anchor="middle" dominant-baseline="central">500×500 BEV on screen</text></g>
+<g class="c-teal"><rect x="350" y="1590" width="250" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="475" y="1612" text-anchor="middle" dominant-baseline="central">saveSnapshot()</text>
+<text class="ts" x="475" y="1629" text-anchor="middle" dominant-baseline="central">/sdcard/Documents/BevSnapshots/</text></g>
+</svg>
+</div>
+<p class="foot">Android-BEV-App · Pure Kotlin IPM · FB-SSEM dataset · arXiv:2303.03651</p>
+</body>
+</html>

@@ -18,7 +18,7 @@ The entire pipeline runs in pure Kotlin on the Jetson Nano CPU. There are no Pyt
 
 | BEV Output | Ground Truth (FB-SSEM dataset) |
 |---|---|
-| ![BEV output](https://github.com/HassanTarekAppraid/Android-BEV-App/blob/master/BevSnapshots/bev_output.png) | ![Ground truth](docs/gt_crop_matched.png) |
+| ![BEV output](https://github.com/HassanTarekAppraid/Android-BEV-App/blob/master/BevSnapshots/bev_output.png) | ![Ground truth](BevSnapshots/ground_truth.png) |
 
 - **Resolution:** 500 × 500 px
 - **Coverage:** 10 m × 10 m ground area (5 m in each direction from rear axle)

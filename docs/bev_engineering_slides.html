@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android BEV — Full Presentation · March 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#070710;--bg2:#0f0f1e;--bg3:#161628;
+  --teal:#00e5c8;--blue:#4a9eff;--purple:#a78bfa;--amber:#fbbf24;--red:#f87171;--green:#4ade80;
+  --text:#eeeef5;--text2:#8888aa;--text3:#555570;
+  --mono:'JetBrains Mono',monospace;--display:'Syne',sans-serif;--body:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:0 0 80px;}
+.navbar{width:100%;background:rgba(7,7,16,.97);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px);position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:50px;gap:10px;}
+.nav-title{font-family:var(--display);font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.05em;white-space:nowrap;}
+.nav-controls{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-btn{background:none;border:1px solid rgba(255,255,255,.12);color:var(--text2);font-family:var(--mono);font-size:11px;padding:4px 13px;border-radius:20px;cursor:pointer;transition:all .18s;}
+.nav-btn:hover{border-color:var(--teal);color:var(--teal);}
+.nav-btn.go{background:var(--teal);color:#000;border-color:var(--teal);font-weight:700;}
+.nav-count{font-family:var(--mono);font-size:11px;color:var(--text2);min-width:50px;text-align:center;}
+.prog{width:110px;height:2px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;}
+.prog-f{height:100%;background:var(--teal);border-radius:1px;transition:width .35s;}
+.toc-wrap{width:100%;max-width:1020px;padding:8px 20px 0;display:flex;flex-wrap:wrap;gap:5px;}
+.tc{font-family:var(--mono);font-size:9px;letter-spacing:.02em;padding:3px 10px;border-radius:20px;cursor:pointer;border:none;background:rgba(255,255,255,.04);color:var(--text3);transition:all .18s;}
+.tc:hover{background:rgba(0,229,200,.08);color:var(--teal);}
+.tc.cur{background:rgba(0,229,200,.12);color:var(--teal);border:1px solid rgba(0,229,200,.25);}
+.stage{width:100%;max-width:1020px;padding:12px 20px 0;}
+.slide-wrap{display:none;}
+.slide-wrap.on{display:block;}
+/* CRITICAL: slides have NO fixed height, NO overflow:hidden */
+.slide{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.07);background:var(--bg2);position:relative;padding:clamp(20px,3%,44px);overflow:visible;}
+.gb{position:absolute;inset:0;border-radius:14px;overflow:hidden;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:50px 50px;z-index:0;}
+.gs{position:absolute;border-radius:50%;pointer-events:none;z-index:0;}
+.abl{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;z-index:1;}
+.abl-t{background:linear-gradient(to bottom,transparent,var(--teal) 40%,transparent);}
+.abl-b{background:linear-gradient(to bottom,transparent,var(--blue) 40%,transparent);}
+.abl-p{background:linear-gradient(to bottom,transparent,var(--purple) 40%,transparent);}
+.abl-a{background:linear-gradient(to bottom,transparent,var(--amber) 40%,transparent);}
+.abl-g{background:linear-gradient(to bottom,transparent,var(--green) 40%,transparent);}
+.sc{position:relative;z-index:2;}
+.notes{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:13px 17px;margin-top:10px;}
+.notes h4{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--teal);text-transform:uppercase;margin-bottom:6px;}
+.notes p{font-size:12.5px;line-height:1.7;color:var(--text2);}
+/* chips */
+.chip{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;letter-spacing:.07em;padding:3px 9px;border-radius:20px;}
+.ct{background:rgba(0,229,200,.1);color:var(--teal);border:1px solid rgba(0,229,200,.2);}
+.cb{background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.2);}
+.cp{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.ca{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2);}
+.cr{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+.cg{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2);}
+.ht{color:var(--teal);}.hb{color:var(--blue);}.hp{color:var(--purple);}.ha{color:var(--amber);}.hr{color:var(--red);}.hg{color:var(--green);}
+/* cards: height always auto */
+.card{background:var(--bg3);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:13px 15px;height:auto;width:100%;}
+.card-t{border-color:rgba(0,229,200,.25);background:rgba(0,229,200,.04);}
+.card-b{border-color:rgba(74,158,255,.25);background:rgba(74,158,255,.04);}
+.card-p{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.04);}
+.card-a{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.04);}
+.card-r{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.04);}
+.card-g{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.04);}
+.cl{font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px;}
+.cl-t{color:var(--teal);}.cl-b{color:var(--blue);}.cl-p{color:var(--purple);}.cl-a{color:var(--amber);}.cl-r{color:var(--red);}.cl-g{color:var(--green);}.cl-d{color:var(--text3);}
+/* typography - NO word-spacing tricks that cause compact look */
+.dh{font-family:var(--display);font-weight:800;letter-spacing:-.01em;line-height:1.08;word-break:normal;}
+.dh-xl{font-size:clamp(30px,4.8vw,54px);}
+.dh-lg{font-size:clamp(22px,3.6vw,40px);}
+.dh-md{font-size:clamp(19px,2.8vw,32px);}
+.bmd{font-size:clamp(11.5px,1.35vw,14.5px);line-height:1.72;color:var(--text2);}
+.bsm{font-size:clamp(10.5px,1.15vw,13px);line-height:1.68;color:var(--text2);}
+.mono-s{font-family:var(--mono);font-size:clamp(8px,.9vw,10.5px);color:var(--text2);}
+/* layout */
+.row{display:flex;flex-wrap:wrap;gap:14px;}
+.col{display:flex;flex-direction:column;gap:11px;}
+.half{flex:1 1 calc(50% - 7px);min-width:240px;}
+.third{flex:1 1 calc(33% - 10px);min-width:190px;}
+.row-top{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center;}
+.sdiv{height:1px;background:rgba(255,255,255,.06);margin:7px 0;}
+.mt6{margin-top:6px;}.mt8{margin-top:8px;}.mt10{margin-top:10px;}.mt12{margin-top:12px;}
+.two-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+/* pros/cons */
+.pc{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.dot-g{background:var(--green);}.dot-r{background:var(--red);}.dot-a{background:var(--amber);}.dot-p{background:var(--purple);}
+/* code */
+.code{background:#040410;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:11px 13px;font-family:var(--mono);font-size:clamp(7.5px,.88vw,10px);line-height:1.82;white-space:pre-wrap;word-break:break-word;}
+.kw{color:#c792ea;}.fn{color:#82aaff;}.cm{color:#546e7a;font-style:italic;}.st{color:#c3e88d;}.nm{color:#f78c6c;}.tp{color:#ffcb6b;}
+/* step badge */
+.sb{font-family:var(--mono);font-size:10px;font-weight:700;width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-t{background:rgba(0,229,200,.15);color:var(--teal);}
+.sb-p{background:rgba(167,139,250,.15);color:var(--purple);}
+.sb-a{background:rgba(251,191,36,.15);color:var(--amber);}
+/* table */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-family:var(--mono);font-size:8.5px;letter-spacing:.07em;color:var(--text3);text-transform:uppercase;padding:5px 9px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);}
+.tbl td{padding:5px 9px;border-bottom:1px solid rgba(255,255,255,.04);font-size:clamp(9.5px,1.05vw,12px);color:var(--text2);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl td:first-child{color:var(--text);font-weight:500;}
+</style>
+</head>
+<body>
+<div class="navbar">
+  <span class="nav-title">Android BEV · March 2026</span>
+  <div class="nav-controls">
+    <button class="nav-btn" onclick="go(-1)">← Prev</button>
+    <div class="prog"><div class="prog-f" id="pf"></div></div>
+    <span class="nav-count" id="nc">1 / 18</span>
+    <button class="nav-btn go" id="nb" onclick="go(1)">Next →</button>
+  </div>
+</div>
+<div class="toc-wrap" id="tocWrap"></div>
+<div class="stage">
+
+<!-- S1 COVER -->
+<div class="slide-wrap on" id="sw1"><div class="slide">
+<div class="gb"></div>
+<div class="gs" style="width:460px;height:460px;top:-90px;right:-50px;background:radial-gradient(circle,rgba(0,229,200,.07) 0%,transparent 65%);"></div>
+<div class="abl abl-t"></div>
+<div class="sc col" style="gap:16px;">
+  <div style="display:flex;gap:7px;flex-wrap:wrap;"><span class="chip ct">Appraid Tech Project</span><span class="chip cb">March 2026</span></div>
+  <div class="dh dh-xl" style="max-width:700px;">Bird's-Eye View<br>on <span class="ht">Android</span></div>
+  <p class="bmd" style="max-width:560px;">From Android platform fundamentals to pure-Kotlin fisheye inverse perspective mapping — a complete engineering walkthrough.</p>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;"><span class="chip ct">Mei Fisheye IPM</span><span class="chip cb">Jetson Nano · Android TV</span><span class="chip ca">FB-SSEM Dataset</span><span class="chip cg">Pure Kotlin · No AI Runtime</span></div>
+  <div class="mono-s" style="color:var(--text3);">https://github.com/HassanTarek-AppraidTech/Android-BEV-App &nbsp;·&nbsp; arXiv:2303.03651</div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>Welcome. This covers the full stack — from what Android is, through AAOS, to how a pure-geometry bird's-eye view is computed on embedded Android hardware.</p></div>
+</div>
+
+<!-- S2 WHAT IS ANDROID -->
+<div class="slide-wrap" id="sw2"><div class="slide">
+<div class="gb"></div><div class="abl abl-g"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cg">Section 01 — Android Platform</span></div>
+  <div class="dh dh-md mt6">What is <span class="hg">Android?</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card"><div class="cl cl-g">Definition</div><p class="bsm">Android is an open-source operating system based on the Linux kernel, developed by Google. It provides a complete software stack: kernel, middleware, runtime, and key applications. Released in 2008, it now powers over 3 billion active devices worldwide — phones, tablets, TVs, watches, cars, and embedded boards.</p></div>
+      <div class="card"><div class="cl cl-g">Architecture Layers</div>
+        <div class="col mt6" style="gap:5px;">
+          <div style="display:flex;gap:7px;align-items:center;"><span class="chip ct" style="font-size:8.5px;">Layer 5</span><span class="bsm">Applications — your APK</span></div>
+          <div style="display:flex;gap:7px;align-items:center;"><span class="chip cb" style="font-size:8.5px;">Layer 4</span><span class="bsm">Application Framework — Activity, Services, ContentProviders</span></div>
+          <div style="display:flex;gap:7px;align-items:center;"><span class="chip cp" style="font-size:8.5px;">Layer 3</span><span class="bsm">Android Runtime (ART) + Core Libraries</span></div>
+          <div style="display:flex;gap:7px;align-items:center;"><span class="chip ca" style="font-size:8.5px;">Layer 2</span><span class="bsm">Hardware Abstraction Layer (HAL)</span></div>
+          <div style="display:flex;gap:7px;align-items:center;"><span class="chip cr" style="font-size:8.5px;">Layer 1</span><span class="bsm">Linux Kernel — drivers, memory, power</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="card card-g"><div class="cl cl-g">Key Characteristics</div>
+        <div class="col mt6" style="gap:5px;">
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Open Source — AOSP is publicly available and forkable by any manufacturer</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Multi-form factor — phones, tablets, TVs, watches, cars, embedded boards</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">APK packaging — one binary runs on any compatible Android device</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Kotlin-first since 2019 — Google's preferred language for Android</p></div>
+        </div>
+      </div>
+      <div class="card"><div class="cl cl-a">Current Version · 2026</div><p class="bsm">Android 15 (API 35) is the current stable release. This project targets API 23 (Android 6.0) for broad compatibility including the Jetson Nano running LineageOS.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>Android is not just a phone OS — it's a full software platform. The Jetson Nano running LineageOS proves this: same APK, same ART runtime, just different hardware underneath.</p></div>
+</div>
+
+<!-- S3 APP STRUCTURE -->
+<div class="slide-wrap" id="sw3"><div class="slide">
+<div class="gb"></div><div class="abl abl-b"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cb">Section 01 — App Structure</span></div>
+  <div class="dh dh-md mt6">Anatomy of an <span class="hb">Android Application</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-b"><div class="cl cl-b">Manifest — AndroidManifest.xml</div><p class="bsm">The most important file in any Android app. Declares the app to the OS: which activities exist, what permissions are needed, which hardware features are required or optional, and which intent filters make the app launchable. Without a valid manifest the OS will not install the APK.</p></div>
+      <div class="card"><div class="cl cl-d">Activities — MainActivity.kt</div><p class="bsm">An Activity represents one screen. It has a lifecycle managed by the OS: onCreate → onStart → onResume → onPause → onStop → onDestroy. Our app has one Activity that owns the entire UI and coordinates all computation.</p></div>
+      <div class="card"><div class="cl cl-d">Assets — bev_images/</div><p class="bsm">Static files bundled inside the APK. Accessed via context.assets.open(). Our fisheye camera PNG images and the ground-truth BEV image live here as bev_images/{cam}/0.png.</p></div>
+    </div>
+    <div class="half col">
+      <div class="card card-p"><div class="cl cl-p">Jetpack Compose — UI Layer</div><p class="bsm">Compose replaces the old XML layout system. UI is declared as Kotlin functions annotated @Composable. State variables using mutableStateOf() automatically trigger UI redraws when changed. We use TV Material3 which adds focus-ring navigation for remote control.</p></div>
+      <div class="card"><div class="cl cl-d">Gradle Build System</div><p class="bsm">Gradle manages compilation, dependency downloading, and APK packaging. build.gradle.kts declares the SDK version, Compose and TV Material3 library versions, and signing config. The libs.versions.toml version catalog centralises all dependency versions.</p></div>
+      <div class="card card-t"><div class="cl cl-t">Kotlin Coroutines — Threading</div><p class="bsm">Dispatchers.Default runs CPU-heavy work on a background thread pool. Dispatchers.Main runs UI updates on the main thread. withContext() switches between them safely. BEV computation (3–5 seconds) must run on Default — without this Android shows an ANR dialog after 5 seconds.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>Every Android app has this skeleton. The threading model is the most critical Android-specific engineering decision in this project.</p></div>
+</div>
+
+<!-- S4 AAOS -->
+<div class="slide-wrap" id="sw4"><div class="slide">
+<div class="gb"></div>
+<div class="gs" style="width:380px;height:380px;bottom:-50px;right:-30px;background:radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 65%);"></div>
+<div class="abl abl-p"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cp">Section 01 — AAOS</span></div>
+  <div class="dh dh-md mt6">What is <span class="hp">Android Automotive OS</span> (AAOS)?</div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-p"><div class="cl cl-p">Definition</div><p class="bsm">Android Automotive OS is a version of Android built directly into the vehicle's infotainment system — not a phone projection like Android Auto. It runs permanently on the car's own ECU hardware whether or not any phone is connected. First production vehicle: Volvo XC40 Recharge (2020).</p></div>
+      <div class="card"><div class="cl cl-p">Key Additions Over Standard Android</div>
+        <div class="col mt6" style="gap:5px;">
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong style="color:var(--text);">Vehicle HAL (VHAL)</strong> — direct access to CAN bus, vehicle speed, gear, door status, hundreds of vehicle properties</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong style="color:var(--text);">CarService API</strong> — controls HVAC zones, audio focus, driver monitoring, instrument cluster</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong style="color:var(--text);">EVS (Exterior View System)</strong> — low-latency hardware camera access for surround-view, bypassing Camera2 API</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong style="color:var(--text);">Always-on architecture</strong> — boots with ignition, no user unlock, persistent services</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong style="color:var(--text);">Multi-display</strong> — native support for cluster + IVI + rear seat as separate zones</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong style="color:var(--text);">Functional Safety</strong> — ISO 26262 ASIL integration hooks</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="card"><div class="cl cl-a">OEMs Using AAOS · 2026</div>
+        <div class="two-grid mt8">
+          <div style="text-align:center;padding:10px;background:rgba(255,255,255,.03);border-radius:8px;"><div style="font-weight:600;font-size:12px;">Volvo / Polestar</div><div class="mono-s mt6">Pioneer adopter</div></div>
+          <div style="text-align:center;padding:10px;background:rgba(255,255,255,.03);border-radius:8px;"><div style="font-weight:600;font-size:12px;">GM / Chevrolet</div><div class="mono-s mt6">Ultifi platform</div></div>
+          <div style="text-align:center;padding:10px;background:rgba(255,255,255,.03);border-radius:8px;"><div style="font-weight:600;font-size:12px;">Honda</div><div class="mono-s mt6">e:N series</div></div>
+          <div style="text-align:center;padding:10px;background:rgba(255,255,255,.03);border-radius:8px;"><div style="font-weight:600;font-size:12px;">Renault</div><div class="mono-s mt6">Scenic E-Tech</div></div>
+        </div>
+      </div>
+      <div class="card card-p"><div class="cl cl-p">Relevance to This Project</div><p class="bsm">Our BEV app targets Android TV on Jetson Nano — a stepping stone. The same Kotlin code, Compose UI, and BevProcessor pipeline could run on an AAOS head unit with two main changes: replace asset-loaded PNGs with live EVS camera feeds, and replace TV Material3 navigation with CarUI library patterns. The BevProcessor geometry is fully platform-agnostic.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The most important AAOS difference for our project is EVS — instead of loading images from assets, we would get direct hardware camera frames at low latency. That single change transforms this prototype into a production system.</p></div>
+</div>
+
+<!-- S5 COMPARISON -->
+<div class="slide-wrap" id="sw5"><div class="slide">
+<div class="gb"></div><div class="abl abl-t"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ct">Section 01 — Platform Comparison</span></div>
+  <div class="dh dh-md mt6">Android vs <span class="ht">AAOS</span> vs Android TV</div>
+  <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.09);margin-top:12px;">
+    <table class="tbl">
+      <thead><tr><th>Aspect</th><th style="color:var(--green);">Standard Android</th><th style="color:var(--purple);">AAOS</th><th style="color:var(--blue);">Android TV (our target)</th></tr></thead>
+      <tbody>
+        <tr><td>Hardware</td><td>Phone / Tablet</td><td>In-vehicle ECU / SoC</td><td>TV / Embedded board (Jetson Nano)</td></tr>
+        <tr><td>Input method</td><td>Touchscreen, gesture</td><td>Rotary knob, touch, voice</td><td>Remote control D-pad focus navigation</td></tr>
+        <tr><td>Boot trigger</td><td>Power button</td><td>Ignition / CAN bus event</td><td>Power supply connected</td></tr>
+        <tr><td>Camera access</td><td>Camera2 API</td><td>VHAL + EVS (Exterior View System)</td><td>Camera2 API or assets (our case)</td></tr>
+        <tr><td>UI framework</td><td>Compose / Views</td><td>Compose + CarUI library</td><td>Compose + TV Material3</td></tr>
+        <tr><td>Multi-display</td><td>Limited</td><td>Native — cluster + IVI + rear</td><td>Single display</td></tr>
+        <tr><td>Safety standard</td><td>None</td><td>ISO 26262 ASIL hooks</td><td>None</td></tr>
+        <tr><td>App distribution</td><td>Play Store</td><td>Play Store for Cars (restricted)</td><td>Play Store for TV</td></tr>
+        <tr><td>Always-on</td><td>No</td><td>Yes — with ignition</td><td>Depends on power supply</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card card-t mt10"><p class="bsm"><span class="ht">Bottom line:</span> All three share the same Linux kernel, ART runtime, Kotlin compiler, and Gradle build system. Differences are in hardware HALs, UI navigation conventions, and safety requirements. Code written for Android TV can be ported to AAOS by changing only the camera input source and UI navigation patterns — the BevProcessor is already platform-agnostic.</p></div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The Camera access row is the most important. On Android TV we load static PNGs. On AAOS we use EVS. That single change transforms this into a production vehicle system.</p></div>
+</div>
+
+<!-- S6 PROJECT INTRO -->
+<div class="slide-wrap" id="sw6"><div class="slide">
+<div class="gb"></div>
+<div class="gs" style="width:440px;height:440px;top:-70px;right:-40px;background:radial-gradient(circle,rgba(0,229,200,.07) 0%,transparent 65%);"></div>
+<div class="abl abl-t"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ct">Section 02 — Project Introduction</span></div>
+  <div class="dh dh-md mt6">The <span class="ht">Problem</span> — Surround View for Vehicles</div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card"><div class="cl cl-d">Problem Statement</div><p class="bsm">A driver has four cameras around the vehicle but cannot perceive the surrounding environment as a unified top-down map. Each camera shows only its own distorted fisheye perspective. Stitching them into a coherent bird's-eye view requires solving the inverse perspective problem for wide-angle fisheye lenses — without a depth sensor and in real time on embedded hardware.</p></div>
+      <div class="card card-t"><div class="cl cl-t">Our Solution</div><p class="bsm">For every pixel in a 500×500 top-down output canvas, compute its real-world ground position in metres, project through each of the 4 fisheye camera models using the Mei projection equation, sample the colour, and blend all contributions weighted by viewing angle and distance. Runs entirely on Jetson Nano CPU in ~3 seconds with no GPU, no network, no AI.</p></div>
+    </div>
+    <div class="half col">
+      <div class="two-grid">
+        <div class="card" style="text-align:center;"><div style="font-family:var(--display);font-size:clamp(22px,3.2vw,36px);font-weight:800;color:var(--teal);line-height:1;">500²</div><div class="bsm mt6">Output pixels</div></div>
+        <div class="card" style="text-align:center;"><div style="font-family:var(--display);font-size:clamp(22px,3.2vw,36px);font-weight:800;color:var(--blue);line-height:1;">10 m</div><div class="bsm mt6">Coverage radius</div></div>
+        <div class="card" style="text-align:center;"><div style="font-family:var(--display);font-size:clamp(22px,3.2vw,36px);font-weight:800;color:var(--purple);line-height:1;">4</div><div class="bsm mt6">Fisheye cameras</div></div>
+        <div class="card" style="text-align:center;"><div style="font-family:var(--display);font-size:clamp(22px,3.2vw,36px);font-weight:800;color:var(--amber);line-height:1;">0</div><div class="bsm mt6">AI at runtime</div></div>
+      </div>
+      <div class="card mt8"><div class="cl cl-d">Dataset — FB-SSEM</div><p class="bsm">Forward-looking Binocular Surround-view Semantic Estimation and Mapping. Unity-simulated parking lot scenes with 4 calibrated fisheye cameras and overhead ground-truth BEV images. Provides calibration files: intrinsics.yml + extrinsics.txt. Paper: arXiv:2303.03651.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The problem is fundamental geometry — how do you unwarp four fisheye perspectives into one overhead view? This is called AVM (Around View Monitor) in the automotive industry and is standard in premium vehicles.</p></div>
+</div>
+
+<!-- S7 METHODOLOGY -->
+<div class="slide-wrap" id="sw7"><div class="slide">
+<div class="gb"></div><div class="abl abl-a"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ca">Section 02 — Methodology</span></div>
+  <div class="dh dh-md mt6">Three Ways to Build a <span class="ha">Surround View System</span></div>
+  <div class="row mt10">
+    <div class="third col">
+      <div class="card" style="border-top:2px solid var(--teal);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;"><div class="cl cl-t">Method 1</div><span class="chip ct" style="font-size:8px;">Our approach</span></div>
+        <div style="font-size:clamp(13px,1.5vw,16px);font-weight:700;margin-bottom:3px;">Classical IPM</div>
+        <div class="bsm" style="color:var(--text3);margin-bottom:9px;">Inverse Perspective Mapping — pure geometry</div>
+        <div class="sdiv"></div>
+        <div class="cl cl-g" style="margin-bottom:5px;">Pros</div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">No training data — only calibration files</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Deterministic — identical input = identical output</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Fully explainable — every pixel traceable to a formula</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Runs on CPU — no GPU required</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Tiny APK — no model weights</p></div>
+        <div class="sdiv"></div>
+        <div class="cl cl-r" style="margin-bottom:5px;">Cons</div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Oblique-angle blur on side lanes — physics limit</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Flat-ground assumption — 3D objects warp</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Car body projects into BEV image</p></div>
+      </div>
+    </div>
+    <div class="third col">
+      <div class="card" style="border-top:2px solid var(--purple);">
+        <div class="cl cl-p" style="margin-bottom:7px;">Method 2</div>
+        <div style="font-size:clamp(13px,1.5vw,16px);font-weight:700;margin-bottom:3px;">Deep Learning BEV</div>
+        <div class="bsm" style="color:var(--text3);margin-bottom:9px;">CNN / Transformer — e.g. F2BEV, BEVFormer</div>
+        <div class="sdiv"></div>
+        <div class="cl cl-g" style="margin-bottom:5px;">Pros</div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Sharp side-lane reconstruction from learned priors</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Can model 3D objects with learned depth cues</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Can produce semantic labels — lane, vehicle, road</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">State-of-the-art visual quality on benchmarks</p></div>
+        <div class="sdiv"></div>
+        <div class="cl cl-r" style="margin-bottom:5px;">Cons</div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Requires GPU — TensorRT or ONNX Runtime</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Needs thousands of labelled training images</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Black box — hard to debug unexpected outputs</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Large APK — model weights add 50–200 MB</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Domain gap — may fail on unseen environments</p></div>
+      </div>
+    </div>
+    <div class="third col">
+      <div class="card" style="border-top:2px solid var(--blue);">
+        <div class="cl cl-b" style="margin-bottom:7px;">Method 3</div>
+        <div style="font-size:clamp(13px,1.5vw,16px);font-weight:700;margin-bottom:3px;">Hybrid IPM + ML</div>
+        <div class="bsm" style="color:var(--text3);margin-bottom:9px;">Geometry backbone + learned refinement</div>
+        <div class="sdiv"></div>
+        <div class="cl cl-g" style="margin-bottom:5px;">Pros</div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">IPM provides geometric accuracy as backbone</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Smaller network — only corrects IPM artifacts</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Interpretable: geometry debuggable, ML refines residuals</p></div>
+        <div class="pc"><div class="dot dot-g"></div><p class="bsm">Best tradeoff between quality and complexity</p></div>
+        <div class="sdiv"></div>
+        <div class="cl cl-r" style="margin-bottom:5px;">Cons</div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">More complex — two stages to maintain</p></div>
+        <div class="pc"><div class="dot dot-r"></div><p class="bsm">Still needs some training data</p></div>
+        <div class="pc"><div class="dot dot-a"></div><p class="bsm">Still needs GPU for refinement pass</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>We chose Method 1: the Jetson Nano CPU cannot run a neural network in real time, and we wanted a fully explainable system. Method 3 is the natural next step when GPU compute becomes available.</p></div>
+</div>
+
+<!-- S8 HARDWARE -->
+<div class="slide-wrap" id="sw8"><div class="slide">
+<div class="gb"></div><div class="abl abl-b"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cb">Section 03 — Hardware &amp; Calibration</span></div>
+  <div class="dh dh-md mt6">System <span class="hb">Hardware</span> &amp; Camera Setup</div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-b"><div class="cl cl-b">Compute Platform — Jetson Nano</div>
+        <table class="tbl mt6">
+          <tr><td>Board</td><td>NVIDIA Jetson Nano</td></tr>
+          <tr><td>OS</td><td>LineageOS / Android TV</td></tr>
+          <tr><td>CPU</td><td>ARM Cortex-A57 quad-core @ 1.43 GHz</td></tr>
+          <tr><td>RAM</td><td>4 GB LPDDR4</td></tr>
+          <tr><td>GPU</td><td>128-core Maxwell (not used by this app)</td></tr>
+          <tr><td>APK target SDK</td><td>API 23 (Android 6.0+)</td></tr>
+          <tr><td>Compute time</td><td>~3 seconds (CPU only)</td></tr>
+        </table>
+      </div>
+      <div class="card"><div class="cl cl-d">Camera Positions — extrinsics CSV</div>
+        <p class="bsm" style="margin-bottom:7px;">Origin = centre of rear axle. X=forward, Y=right, Z=up. rz=180° cameras are physically mounted upside-down and are flipped 180° in code before processing.</p>
+        <table class="tbl">
+          <tr><th>Camera</th><th>X (m)</th><th>Y (m)</th><th>Z (m)</th><th>rz handling</th></tr>
+          <tr><td>Front</td><td>0.000</td><td>0.406</td><td>3.873</td><td>flip 180°</td></tr>
+          <tr><td>Left</td><td>-1.024</td><td>0.800</td><td>2.053</td><td>no flip</td></tr>
+          <tr><td>Rear</td><td>0.132</td><td>0.744</td><td>-1.001</td><td>flip 180°</td></tr>
+          <tr><td>Right</td><td>1.015</td><td>0.801</td><td>2.040</td><td>no flip</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="card card-t"><div class="cl cl-t">Camera Intrinsics — camera_intrinsics.yml</div>
+        <p class="bsm" style="margin-bottom:7px;">Measured through physical calibration using a checkerboard pattern. Specific to this camera model.</p>
+        <table class="tbl">
+          <tr><td>ξ (xi)</td><td style="font-family:var(--mono);color:var(--teal);">1.7634</td><td>Mei fisheye parameter</td></tr>
+          <tr><td>fx</td><td style="font-family:var(--mono);color:var(--teal);">331.0 px</td><td>Horizontal focal length</td></tr>
+          <tr><td>fy</td><td style="font-family:var(--mono);color:var(--teal);">331.0 px</td><td>Vertical focal length</td></tr>
+          <tr><td>cx</td><td style="font-family:var(--mono);color:var(--teal);">256.0 px</td><td>Principal point X</td></tr>
+          <tr><td>cy</td><td style="font-family:var(--mono);color:var(--teal);">256.0 px</td><td>Principal point Y</td></tr>
+          <tr><td>Image size</td><td style="font-family:var(--mono);color:var(--teal);">512 × 512 px</td><td>After scaling</td></tr>
+        </table>
+      </div>
+      <div class="card"><div class="cl cl-d">Yaw Angles per Camera</div>
+        <p class="bsm" style="margin-bottom:7px;">Each camera's horizontal facing direction. Used to build the 3×3 rotation matrix and compute angular blend weights.</p>
+        <table class="tbl">
+          <tr><th>Camera</th><th>Yaw (°)</th><th>Yaw (rad)</th><th>Direction</th></tr>
+          <tr><td>Front</td><td>0°</td><td>0</td><td>Straight ahead</td></tr>
+          <tr><td>Right</td><td>90°</td><td>π/2</td><td>Rightward</td></tr>
+          <tr><td>Rear</td><td>180°</td><td>π</td><td>Backward</td></tr>
+          <tr><td>Left</td><td>270°</td><td>3π/2</td><td>Leftward</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The rz=180° physical mounting is the most surprising hardware detail. The front and rear cameras are literally mounted upside-down. Without the bitmap rotation correction, their images appear inverted in the BEV output.</p></div>
+</div>
+
+<!-- S9 BEV CANVAS -->
+<div class="slide-wrap" id="sw9"><div class="slide">
+<div class="gb"></div><div class="abl abl-t"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ct">Section 04 — Algorithm</span></div>
+  <div class="dh dh-md mt6">BEV Canvas — <span class="ht">Coordinate System</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-t"><div class="cl cl-t">Canvas Parameters</div>
+        <table class="tbl mt6">
+          <tr><td>Output size</td><td style="font-family:var(--mono);color:var(--teal);">500 × 500 px</td></tr>
+          <tr><td>Scale</td><td style="font-family:var(--mono);color:var(--teal);">0.02 m/px = 2 cm per pixel</td></tr>
+          <tr><td>Total coverage</td><td style="font-family:var(--mono);color:var(--teal);">10 m × 10 m ground area</td></tr>
+          <tr><td>Origin pixel</td><td style="font-family:var(--mono);color:var(--teal);">(col=250, row=250)</td></tr>
+          <tr><td>Forward range (X)</td><td style="font-family:var(--mono);color:var(--teal);">−5 m to +5 m</td></tr>
+          <tr><td>Lateral range (Y)</td><td style="font-family:var(--mono);color:var(--teal);">−5 m to +5 m</td></tr>
+        </table>
+      </div>
+      <div class="card"><div class="cl cl-d">Pixel → World Conversion</div>
+        <div class="code mt6"><span class="cm">// Row 0 = farthest forward (+5m ahead)</span>
+<span class="cm">// Row 500 = farthest back (-5m behind)</span>
+<span class="tp">worldX</span> = RANGE_X_MAX - row × SCALE
+         = <span class="nm">5.0</span> - row × <span class="nm">0.02</span>  <span class="cm">// metres forward</span>
+
+<span class="cm">// Col 0 = far left (-5m), Col 500 = far right (+5m)</span>
+<span class="tp">worldY</span> = RANGE_Y_MIN + col × SCALE
+         = <span class="nm">-5.0</span> + col × <span class="nm">0.02</span> <span class="cm">// metres rightward</span></div>
+      </div>
+      <div class="card card-a"><div class="cl cl-a">Image Orientation</div><p class="bsm">In the output image, UP = forward (ahead of car). Row 0 is farthest forward. Row 500 is farthest backward. This matches the natural driving perspective — what's ahead is at the top.</p></div>
+    </div>
+    <div class="half" style="display:flex;align-items:center;justify-content:center;">
+      <svg width="clamp(200px,30vw,290px)" viewBox="0 0 290 290" style="width:clamp(200px,30vw,290px);">
+        <line x1="145" y1="0" x2="145" y2="290" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+        <line x1="0" y1="145" x2="290" y2="145" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+        <rect x="10" y="10" width="270" height="270" rx="6" fill="rgba(0,229,200,.03)" stroke="rgba(0,229,200,.2)" stroke-width="1.5"/>
+        <circle cx="145" cy="145" r="54" fill="none" stroke="rgba(0,229,200,.28)" stroke-width="1" stroke-dasharray="4 3"/>
+        <circle cx="145" cy="145" r="108" fill="none" stroke="rgba(74,158,255,.22)" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="126" y="86" width="38" height="108" rx="4" fill="rgba(0,229,200,.06)" stroke="#00e5c8" stroke-width="2"/>
+        <line x1="145" y1="182" x2="145" y2="104" stroke="#00e5c8" stroke-width="2"/>
+        <polygon points="145,90 136,108 154,108" fill="#00e5c8"/>
+        <circle cx="145" cy="145" r="5" fill="#00e5c8"/>
+        <text x="152" y="142" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(0,229,200,.7)">origin</text>
+        <text x="145" y="8" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(255,255,255,.28)">+5m forward</text>
+        <text x="145" y="286" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(255,255,255,.28)">−5m rear</text>
+        <circle cx="145" cy="22" r="5" fill="#a78bfa"/><text x="154" y="26" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(167,139,250,.8)">FRONT</text>
+        <circle cx="145" cy="268" r="5" fill="#a78bfa"/><text x="154" y="272" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(167,139,250,.8)">REAR</text>
+        <circle cx="22" cy="145" r="5" fill="#a78bfa"/><text x="30" y="149" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(167,139,250,.8)">LEFT</text>
+        <circle cx="268" cy="145" r="5" fill="#a78bfa"/><text x="208" y="149" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(167,139,250,.8)">RIGHT</text>
+      </svg>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The coordinate system is the foundation of everything. The origin at (250,250) represents the real-world rear axle — the physical reference point for all camera extrinsics.</p></div>
+</div>
+
+<!-- S10 IPM CONCEPT -->
+<div class="slide-wrap" id="sw10"><div class="slide">
+<div class="gb"></div><div class="abl abl-p"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cp">Section 04 — IPM Concept</span></div>
+  <div class="dh dh-md mt6">Inverse Perspective Mapping — <span class="hp">Core Insight</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-r"><div class="cl cl-r">Forward Projection — Not What We Do</div><p class="bsm">For each camera pixel (u,v) → find where it lands on the ground. Problem: many fisheye pixels point at the sky, other vehicles, or buildings — not the ground at all. Requires depth estimation or LiDAR to resolve where each ray intersects the ground plane. Far more complex.</p></div>
+      <div class="card card-g"><div class="cl cl-g">Inverse Projection — Our Approach</div><p class="bsm">For each output BEV pixel → compute its real-world ground position → ask each camera: which of your pixels shows this ground location? Guaranteed to only sample ground-level content. No depth sensor needed — we assume Y=0 (flat ground) which is exact for road surface.</p></div>
+      <div class="card card-a"><div class="cl cl-a">Flat Ground Assumption</div><p class="bsm">Every BEV pixel maps to height Y=0. Exact for road surface, parking lines, markings. Fails for 3D objects — other cars, walls, pedestrians — which appear stretched because their actual height is non-zero. This is the fundamental physical limitation of all camera-only IPM systems.</p></div>
+    </div>
+    <div class="half col">
+      <div class="card"><div class="cl cl-d">Algorithm — 6 Steps Per Pixel Per Camera</div>
+        <div class="col mt8" style="gap:8px;">
+          <div style="display:flex;gap:9px;align-items:flex-start;"><span class="sb sb-t">A</span><div><div style="font-size:11.5px;font-weight:600;color:var(--teal);margin-bottom:2px;">World coordinates</div><div class="bsm">Convert BEV pixel (row,col) to real-world metres (worldX, worldY)</div></div></div>
+          <div style="display:flex;gap:9px;align-items:flex-start;"><span class="sb sb-t">B</span><div><div style="font-size:11.5px;font-weight:600;color:var(--teal);margin-bottom:2px;">Camera transform</div><div class="bsm">[xc,yc,zc] = R × [worldX, worldY, camHeight=1m]</div></div></div>
+          <div style="display:flex;gap:9px;align-items:flex-start;"><span class="sb sb-p">C</span><div><div style="font-size:11.5px;font-weight:600;color:var(--purple);margin-bottom:2px;">Mei fisheye projection</div><div class="bsm">r3d → mzXi → pixel coordinates (u,v) in fisheye image</div></div></div>
+          <div style="display:flex;gap:9px;align-items:flex-start;"><span class="sb sb-a">D</span><div><div style="font-size:11.5px;font-weight:600;color:var(--amber);margin-bottom:2px;">Blend weight</div><div class="bsm">cosA^1.5 / distance — prioritise direct-viewing cameras</div></div></div>
+          <div style="display:flex;gap:9px;align-items:flex-start;"><span class="sb sb-t">E</span><div><div style="font-size:11.5px;font-weight:600;color:var(--teal);margin-bottom:2px;">Bilinear interpolation</div><div class="bsm">Sub-pixel colour sampling from 4 surrounding pixels</div></div></div>
+          <div style="display:flex;gap:9px;align-items:flex-start;"><span class="sb sb-t">F</span><div><div style="font-size:11.5px;font-weight:600;color:var(--teal);margin-bottom:2px;">Weighted accumulation</div><div class="bsm">bevR/G/B[i] += w×colour · totalW[i] += w</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The inversion is the entire trick. We never ask "where does this camera pixel land?" We ask "which camera pixel shows this ground location?" The flat ground assumption is the price for not needing depth sensors.</p></div>
+</div>
+
+<!-- S11 ROTATION MATRIX -->
+<div class="slide-wrap" id="sw11"><div class="slide">
+<div class="gb"></div><div class="abl abl-b"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cb">Section 04 — Step B</span></div>
+  <div class="dh dh-md mt6">Camera Transform — <span class="hb">Rotation Matrix</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-b"><div class="cl cl-b">Purpose</div><p class="bsm">Converts a direction vector from world coordinates into the camera's own local coordinate frame. After this, xc is rightward in the camera frame, yc is upward, and zc is depth along the optical axis. If zc is negative the ground point is behind the camera — skip it.</p></div>
+      <div class="card"><div class="cl cl-d">3×3 Matrix Structure</div>
+        <div class="col mt6" style="gap:7px;">
+          <div class="pc"><div class="dot" style="background:var(--blue);"></div><p class="bsm"><strong style="color:var(--blue);">Row 1 (X axis)</strong> — camera right direction, perpendicular to optical axis in the horizontal plane</p></div>
+          <div class="pc"><div class="dot" style="background:var(--purple);"></div><p class="bsm"><strong style="color:var(--purple);">Row 2 (Y axis)</strong> — camera up direction, computed as cross product of Z×X</p></div>
+          <div class="pc"><div class="dot" style="background:var(--teal);"></div><p class="bsm"><strong style="color:var(--teal);">Row 3 (Z axis)</strong> — optical axis direction the camera faces = (cos(yaw), sin(yaw), 0)</p></div>
+        </div>
+      </div>
+      <div class="card"><div class="cl cl-d">Example — Front Camera (yaw = 0°)</div><p class="bsm">cos(0°)=1, sin(0°)=0. Z-axis=(1,0,0) points straight forward. X-axis=(0,1,0) points right. For a ground point 5m ahead: after transform xc=0 (no lateral), yc=0 (no vertical), zc=5 (directly in front at positive depth).</p></div>
+    </div>
+    <div class="half col">
+      <div class="code"><span class="cm">// buildRotationMatrix(yaw: Float)</span>
+
+<span class="cm">// Z-axis: camera optical axis direction</span>
+<span class="kw">val</span> zx = <span class="fn">cos</span>(yaw)  <span class="cm">// world-forward component</span>
+<span class="kw">val</span> zy = <span class="fn">sin</span>(yaw)  <span class="cm">// world-right component</span>
+
+<span class="cm">// X-axis: camera right (perpendicular to Z, 90° rotated)</span>
+<span class="kw">var</span> xx = -zy
+<span class="kw">var</span> xy =  zx
+
+<span class="cm">// Y-axis: camera up = Z cross X</span>
+<span class="kw">val</span> yz = zx*xy - zy*xx
+
+<span class="cm">// Row-major 3×3 matrix stored as FloatArray[9]</span>
+<span class="cm">// Row 1: [ xx,  xy,  0  ]  ← camera right</span>
+<span class="cm">// Row 2: [ 0,   0,   yz ]  ← camera up</span>
+<span class="cm">// Row 3: [ zx,  zy,  0  ]  ← optical axis</span>
+
+<span class="cm">// Applied in main loop:</span>
+<span class="cm">// dx=worldX  dy=worldY  dz=CAM_HEIGHT(1m)</span>
+<span class="kw">val</span> xc = R[<span class="nm">0</span>]*dx + R[<span class="nm">1</span>]*dy + R[<span class="nm">2</span>]*dz
+<span class="kw">val</span> yc = R[<span class="nm">3</span>]*dx + R[<span class="nm">4</span>]*dy + R[<span class="nm">5</span>]*dz
+<span class="kw">val</span> zc = R[<span class="nm">6</span>]*dx + R[<span class="nm">7</span>]*dy + R[<span class="nm">8</span>]*dz
+<span class="cm">// zc &lt; 0  →  point behind camera  →  skip</span></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The matrix is pre-built once per camera before the main loop. Building it 250,000 times inside the loop would be pure waste. The 9 elements are extracted to local variables before the pixel loop for CPU register efficiency.</p></div>
+</div>
+
+<!-- S12 MEI MODEL -->
+<div class="slide-wrap" id="sw12"><div class="slide">
+<div class="gb"></div>
+<div class="gs" style="width:360px;height:360px;top:-40px;right:-20px;background:radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 65%);"></div>
+<div class="abl abl-p"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cp">Section 04 — Step C</span></div>
+  <div class="dh dh-md mt6">Mei Unified <span class="hp">Fisheye Model</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-r"><div class="cl cl-r">Why Not Standard Pinhole?</div><p class="bsm">Standard pinhole: u = fx×(xc/zc)+cx. Fails above ~160° FOV because zc approaches zero for near-horizontal rays (division by near-zero → extreme distortion) and becomes negative for rays beyond 90° (point appears behind camera even though the lens physically sees it). Our fisheye cameras exceed 180° FOV.</p></div>
+      <div class="card"><div class="cl cl-p">Mei Model Concept</div><p class="bsm">Project the 3D point onto a unit sphere. Then shift the projection centre inward along the optical axis by ξ (xi). This single parameter controls how fisheye the projection is. ξ=0 recovers standard pinhole exactly. As ξ increases, wider angles compress into the image, allowing 200°+ FOV.</p></div>
+      <div class="card"><div class="cl cl-d">ξ Parameter — Intuition</div>
+        <table class="tbl mt4">
+          <tr><td>ξ = 0.0</td><td>Standard pinhole — fails above ~160° FOV</td></tr>
+          <tr><td>ξ = 0.5</td><td>Mild wide-angle lens</td></tr>
+          <tr><td>ξ = 1.0</td><td>Fisheye ~180° field of view</td></tr>
+          <tr><td style="color:var(--teal);">ξ = 1.76</td><td>Our cameras — extreme fisheye, ~200° FOV</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="code"><span class="cm">// Step C: Mei fisheye projection</span>
+
+<span class="cm">// 1. Distance from camera origin to ground point</span>
+<span class="kw">val</span> r3d = <span class="fn">sqrt</span>(xc*xc + yc*yc + zc*zc) + <span class="nm">1e-9f</span>
+<span class="cm">//   +1e-9f prevents division by zero</span>
+
+<span class="cm">// 2. Mei denominator: normalise onto sphere then add ξ</span>
+<span class="kw">val</span> mzXi = zc / r3d + <span class="nm">XI</span>  <span class="cm">// XI = 1.7634</span>
+<span class="kw">if</span> (mzXi &lt; <span class="nm">1e-5f</span>) <span class="kw">continue</span>
+<span class="cm">//   mzXi ≤ 0: point behind mirror plane → skip</span>
+
+<span class="cm">// 3. Project to image plane</span>
+<span class="cm">//   xc/r3d = x on unit sphere (range -1..+1)</span>
+<span class="cm">//   divide by mzXi = Mei perspective division</span>
+<span class="cm">//   multiply by FX = scale to pixels</span>
+<span class="cm">//   add CX = shift to top-left image origin</span>
+<span class="kw">val</span> u = <span class="nm">FX</span> * (xc / r3d) / mzXi + <span class="nm">CX</span>
+<span class="kw">val</span> v = <span class="nm">FY</span> * (yc / r3d) / mzXi + <span class="nm">CY</span>
+
+<span class="cm">// 4. Bounds check — skip if outside image</span>
+<span class="kw">if</span> (u &lt; <span class="nm">0f</span> || u &gt;= IMG_W-<span class="nm">1f</span> ||
+    v &lt; <span class="nm">0f</span> || v &gt;= IMG_H-<span class="nm">1f</span>) <span class="kw">continue</span></div>
+      <div class="card card-p mt8"><div class="cl cl-p">What xc/r3d Means</div><p class="bsm">Dividing xc by r3d places the 3D point on the surface of a unit sphere. The result is the x-direction cosine — always between −1 and +1. Dividing by mzXi applies the Mei perspective division. The larger ξ is, the more mzXi stays away from zero even for wide angles, which is what enables the fisheye to see beyond 90°.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>When ξ=0: mzXi = zc/r3d = cosine of the angle from the optical axis. This recovers pinhole exactly. The ξ shift is the sole mathematical difference between fisheye and pinhole projection.</p></div>
+</div>
+
+<!-- S13 BLEND + BILINEAR -->
+<div class="slide-wrap" id="sw13"><div class="slide">
+<div class="gb"></div><div class="abl abl-a"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ca">Section 04 — Steps D &amp; E</span></div>
+  <div class="dh dh-md mt6">Blend Weight + <span class="ha">Bilinear Interpolation</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-a"><div class="cl cl-a">Step D — Blend Weight</div><p class="bsm">Multiple cameras can see the same ground point. All contributions are blended. Each camera's weight is proportional to how directly it looks at the point and inversely proportional to the distance from the car origin. This gives smooth transitions between camera zones with no hard seams.</p></div>
+      <div class="code"><span class="cm">// Distance from car origin to ground point</span>
+<span class="kw">val</span> dist = <span class="fn">sqrt</span>(worldX*worldX + worldY*worldY) + <span class="nm">1e-6f</span>
+
+<span class="cm">// cosA: dot product of camera optical axis with</span>
+<span class="cm">// direction to the ground point.</span>
+<span class="cm">// 1.0 = camera looks directly at point</span>
+<span class="cm">// 0.0 = point is 90° to the side</span>
+<span class="cm">// negative = point is behind the camera</span>
+<span class="kw">val</span> cosA = (<span class="fn">cos</span>(yaw)*worldX + <span class="fn">sin</span>(yaw)*worldY) / dist
+<span class="kw">if</span> (cosA &lt;= <span class="nm">0f</span>) <span class="kw">continue</span>  <span class="cm">// skip if behind camera</span>
+
+<span class="cm">// cosA^1.5 sharpens falloff for oblique views</span>
+<span class="cm">// coerceIn prevents div/0 and extreme weights</span>
+<span class="kw">val</span> weight = cosA.<span class="fn">pow</span>(<span class="nm">1.5f</span>) / dist.<span class="fn">coerceIn</span>(<span class="nm">0.1f</span>, <span class="nm">15f</span>)</div>
+    </div>
+    <div class="half col">
+      <div class="card"><div class="cl cl-t">Step E — Bilinear Interpolation</div><p class="bsm">The projected coordinate (u,v) is almost never a whole number. Without interpolation the output has a coarse blocky texture. Bilinear blends the four integer-coordinate neighbours weighted by how close the point is to each corner.</p></div>
+      <div class="code"><span class="cm">// Integer neighbours around the projected point</span>
+<span class="kw">val</span> u0 = u.<span class="fn">toInt</span>()  <span class="cm">// floor(u) = left col</span>
+<span class="kw">val</span> v0 = v.<span class="fn">toInt</span>()  <span class="cm">// floor(v) = top row</span>
+<span class="kw">val</span> u1 = u0 + <span class="nm">1</span>     <span class="cm">// right neighbour</span>
+<span class="kw">val</span> v1 = v0 + <span class="nm">1</span>     <span class="cm">// bottom neighbour</span>
+<span class="kw">val</span> du = u - u0      <span class="cm">// fractional part 0.0..1.0</span>
+<span class="kw">val</span> dv = v - v0      <span class="cm">// fractional part 0.0..1.0</span>
+
+<span class="cm">// 4-corner weighted blend:</span>
+<span class="cm">// c00*(1-du)*(1-dv)  +  c01*du*(1-dv)</span>
+<span class="cm">// c10*(1-du)*dv      +  c11*du*dv</span></div>
+      <div class="card card-t mt8"><div class="cl cl-t">Performance Note</div><p class="bsm">The cosA ≤ 0 check runs BEFORE the matrix multiply and Mei projection — eliminating ~50% of iterations before any expensive maths. This single early exit is the biggest single performance optimisation in the whole pipeline.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>cosA^1.5 is a tuneable parameter. Lower = smoother blending but blurrier. Higher = sharper camera zone boundaries but more visible transition lines. 1.5 was found empirically to give the best result on this dataset.</p></div>
+</div>
+
+<!-- S14 ACCUMULATION -->
+<div class="slide-wrap" id="sw14"><div class="slide">
+<div class="gb"></div><div class="abl abl-t"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ct">Section 04 — Steps F &amp; Assembly</span></div>
+  <div class="dh dh-md mt6">Accumulation → <span class="ht">Final Bitmap</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-t"><div class="cl cl-t">Step F — Weighted Accumulation</div><p class="bsm">For each output pixel, all 4 cameras may contribute. Their colour contributions are summed with individual weights into parallel float arrays. After the complete loop, dividing by total weight gives the final weighted-average colour. Two-pass approach guarantees mathematically correct blend regardless of camera count.</p></div>
+      <div class="code"><span class="cm">// Inside camera loop — per pixel per camera</span>
+bevR[idx] += weight * <span class="fn">bilinear</span>(R0,R1,R2,R3, du,dv)
+bevG[idx] += weight * <span class="fn">bilinear</span>(G0,G1,G2,G3, du,dv)
+bevB[idx] += weight * <span class="fn">bilinear</span>(B0,B1,B2,B3, du,dv)
+totalW[idx] += weight
+
+<span class="cm">// After all cameras and all pixels — normalise</span>
+<span class="kw">for</span> (i <span class="kw">in</span> <span class="nm">0</span> until BEV_W * BEV_H) {
+  <span class="kw">val</span> w = totalW[i]
+  <span class="kw">if</span> (w > <span class="nm">1e-9f</span>) {
+    outPixels[i] = Color.<span class="fn">rgb</span>(
+      (bevR[i] / w).<span class="fn">toInt</span>().<span class="fn">coerceIn</span>(<span class="nm">0</span>, <span class="nm">255</span>),
+      (bevG[i] / w).<span class="fn">toInt</span>().<span class="fn">coerceIn</span>(<span class="nm">0</span>, <span class="nm">255</span>),
+      (bevB[i] / w).<span class="fn">toInt</span>().<span class="fn">coerceIn</span>(<span class="nm">0</span>, <span class="nm">255</span>))
+  } <span class="cm">// else stays BLACK — under car body</span>
+}</div>
+    </div>
+    <div class="half col">
+      <div class="card"><div class="cl cl-d">Why Two Passes?</div><p class="bsm">We cannot compute the final average during the inner loop because when processing the first camera for a pixel we don't yet know the total weight from all 4 cameras. Accumulate first, normalise second. Same principle used in HDR tone mapping, alpha compositing, and radiosity rendering.</p></div>
+      <div class="card card-b"><div class="cl cl-b">Memory Layout — Why Flat Arrays?</div><p class="bsm">Four parallel FloatArrays — bevR, bevG, bevB, totalW — each 250,000 elements (500×500). Flat arrays have sequential memory layout with excellent CPU cache locality. Reading the next element is one pointer increment. A 2D array or Map would add bounds-checking overhead on every one of the 1,000,000 inner-loop iterations.</p></div>
+      <div class="card card-t"><div class="cl cl-t">Pixels with totalW ≈ 0</div><p class="bsm">Pixels directly under the car body are too close for any camera to see the ground through the chassis. Their totalW stays near zero. They remain black in the output bitmap and are covered by the green car box overlay drawn on top.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The two-pass weighted mean is standard in signal processing: accumulate numerator (weighted sum) and denominator (total weight) separately, then divide once. coerceIn(0,255) clamps floating point rounding errors.</p></div>
+</div>
+
+<!-- S15 OVERLAY -->
+<div class="slide-wrap" id="sw15"><div class="slide">
+<div class="gb"></div><div class="abl abl-b"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cb">Section 04 — Overlay</span></div>
+  <div class="dh dh-md mt6"><span class="hb">drawOverlay()</span> — Annotations</div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-b"><div class="cl cl-b">Coordinate Helper — toPx()</div>
+        <p class="bsm" style="margin-bottom:7px;">Converts world metres back to BEV pixel position — the exact inverse of the main loop formula.</p>
+        <div class="code"><span class="cm">// Inverse of main loop coordinate conversion</span>
+<span class="kw">fun</span> <span class="fn">toPx</span>(xM: <span class="tp">Float</span>, yM: <span class="tp">Float</span>) =
+  <span class="fn">Pair</span>(
+    (yM - RANGE_Y_MIN) / SCALE,  <span class="cm">// → col pixel</span>
+    (RANGE_X_MAX - xM) / SCALE   <span class="cm">// → row pixel</span>
+  )
+<span class="cm">// toPx(0f, 0f) = (250, 250) = rear axle origin</span>
+<span class="cm">// toPx(5f, 0f) = (250,   0) = far forward</span>
+<span class="cm">// toPx(0f, 2f) = (350, 250) = 2m to the right</span></div>
+      </div>
+      <div class="card"><div class="cl cl-d">Overlay Elements</div>
+        <table class="tbl mt6">
+          <tr><td>Car box</td><td>±2m forward/rear, ±1m lateral + CAR_Y_OFFSET. Dark fill hides projection artifacts.</td></tr>
+          <tr><td>Arrow</td><td>Shaft from rear(−1.2m) to front(+1.5m). Tip UP = forward. Wings spread left+right downward = ∧ arrowhead.</td></tr>
+          <tr><td>2m ring</td><td>Cyan, radius = 2/SCALE = 100px, centred on (250,250).</td></tr>
+          <tr><td>4m ring</td><td>Blue, radius = 4/SCALE = 200px, centred on (250,250).</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="card card-a"><div class="cl cl-a">CAR_Y_OFFSET = 1.3f</div><p class="bsm">The rear camera is mounted at X=+0.132m (slightly right of centre). Combined with the fisheye projection geometry, the car body appears shifted rightward in the rendered BEV texture. CAR_Y_OFFSET shifts the overlay box to visually match. Tune by visual comparison with an overhead reference image for a different vehicle.</p></div>
+      <div class="card card-r"><div class="cl cl-r">Arrow Bug — Fixed</div><p class="bsm">The original code had both arrowhead wings going to bx−10 — both going LEFT, making a sideways ⟩ shape. Fix: left wing = (bx−10, by+10), right wing = (bx+10, by+10). Both go downward (by+10 = larger row = backward in image), spreading left and right to form a correct ∧ arrowhead pointing toward the front of the car.</p></div>
+      <div class="card card-t"><div class="cl cl-t">Why Rings Are at (250,250)</div><p class="bsm">toPx(0f, 0f) = column 250, row 250 — the pixel coordinate of the real-world origin (rear axle). Rings represent physical 2m and 4m radius circles around the vehicle's rear axle, giving the driver a calibrated spatial reference in the display.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>toPx() is the exact algebraic inverse of the main loop formula. Forward direction maps to smaller row numbers because row 0 is the top of the image = farthest forward. This is why the arrowhead at the front appears at the top of the green box.</p></div>
+</div>
+
+<!-- S16 MAINACTIVITY -->
+<div class="slide-wrap" id="sw16"><div class="slide">
+<div class="gb"></div><div class="abl abl-p"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip cp">Section 05 — Implementation</span></div>
+  <div class="dh dh-md mt6"><span class="hp">MainActivity.kt</span> — UI &amp; Orchestration</div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card card-p"><div class="cl cl-p">Threading Model — Critical Design Decision</div>
+        <div class="code mt6"><span class="cm">// computeBev() — correct coroutine pattern</span>
+scope.<span class="fn">launch</span> {                      <span class="cm">// Main thread</span>
+  isLoading = <span class="kw">true</span>
+  <span class="kw">val</span> (bev, gt, dt) =
+    <span class="fn">withContext</span>(Dispatchers.Default) {
+      <span class="cm">// Background thread pool</span>
+      <span class="cm">// MUST be here — 3-5s on Main = ANR dialog</span>
+      <span class="kw">val</span> imgs = <span class="fn">loadImages</span>()
+      <span class="kw">val</span> t0   = System.<span class="fn">currentTimeMillis</span>()
+      <span class="kw">val</span> bev  = BevProcessor.<span class="fn">buildBev</span>(imgs)
+      Triple(bev, <span class="fn">loadGt</span>(),
+        System.<span class="fn">currentTimeMillis</span>() - t0)
+    }                                  <span class="cm">// Back to Main</span>
+  bevBitmap  = bev   <span class="cm">// triggers Compose redraw</span>
+  timingText = <span class="st">"Computed in ${dt} ms"</span>
+  isLoading  = <span class="kw">false</span>
+}</div>
+      </div>
+      <div class="card mt8"><div class="cl cl-d">State Variables — Jetpack Compose</div>
+        <p class="bsm" style="margin-bottom:7px;">Declared with mutableStateOf() inside remember{}. Any change automatically triggers a Compose recomposition — affected UI parts redraw themselves with no manual invalidation.</p>
+        <table class="tbl">
+          <tr><td>bevBitmap</td><td>Computed BEV result bitmap or null</td></tr>
+          <tr><td>gtBitmap</td><td>Cropped ground truth bitmap or null</td></tr>
+          <tr><td>showingGt</td><td>Toggle — which image to display</td></tr>
+          <tr><td>isLoading</td><td>Controls progress bar and button disabled state</td></tr>
+          <tr><td>statusText</td><td>Status line shown under the title</td></tr>
+          <tr><td>timingText</td><td>Elapsed compute time in milliseconds</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="card"><div class="cl cl-d">UI Components — Jetpack Compose TV</div>
+        <div class="col mt6" style="gap:6px;">
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong>Column</strong> — vertical layout fills screen with dark background (#111111)</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong>Box with weight(1f)</strong> — image display expands to fill all remaining vertical space between title and buttons</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong>Image(ContentScale.Fit)</strong> — scales the 500×500 BEV bitmap to fill the box preserving its square aspect ratio</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong>BevButton (TV Material3)</strong> — focusedContainerColor=green makes the selected button clearly visible under D-pad navigation</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong>LinearProgressIndicator</strong> — shown during BEV computation to indicate background activity</p></div>
+          <div class="pc"><div class="dot dot-p"></div><p class="bsm"><strong>LaunchedEffect(Unit)</strong> — auto-triggers computeBev() on first launch so BEV appears immediately</p></div>
+        </div>
+      </div>
+      <div class="card card-b mt8"><div class="cl cl-b">saveSnapshot() — File I/O</div><p class="bsm">Writes PNG to /sdcard/Documents/BevSnapshots/ using FileOutputStream + bitmap.compress(PNG, quality=100). Creates directory if absent. Lossless PNG preserves all pixel data. Full file path shown in statusText after successful save.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>Threading is the most critical Android-specific engineering decision. Without withContext(Dispatchers.Default), the 3-5 second computation blocks the main thread and Android shows an ANR dialog after 5 seconds.</p></div>
+</div>
+
+<!-- S17 RESULTS -->
+<div class="slide-wrap" id="sw17"><div class="slide">
+<div class="gb"></div><div class="abl abl-t"></div>
+<div class="sc col">
+  <div class="row-top"><span class="chip ct">Section 06 — Results &amp; Limitations</span></div>
+  <div class="dh dh-md mt6">Output Quality &amp; <span class="ht">Engineering Limitations</span></div>
+  <div class="row mt10">
+    <div class="half col">
+      <div class="card"><div class="cl cl-d">Performance Metrics</div>
+        <table class="tbl mt6">
+          <tr><td>Compute time</td><td style="font-family:var(--mono);color:var(--teal);">~3 seconds (Jetson Nano CPU only)</td></tr>
+          <tr><td>Total iterations</td><td style="font-family:var(--mono);">500×500×4 = 1,000,000</td></tr>
+          <tr><td>Working memory</td><td style="font-family:var(--mono);">4 arrays × 250K × 4B ≈ 4 MB</td></tr>
+          <tr><td>Output bitmap</td><td style="font-family:var(--mono);">500×500 ARGB ≈ 1 MB</td></tr>
+          <tr><td>Input bitmaps</td><td style="font-family:var(--mono);">4 × 512×512 ARGB ≈ 4 MB</td></tr>
+          <tr><td>Total peak memory</td><td style="font-family:var(--mono);">~10 MB — well within Jetson RAM</td></tr>
+        </table>
+      </div>
+      <div class="card card-g mt8"><div class="cl cl-g">What Works Well</div>
+        <div class="col mt6" style="gap:5px;">
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Road texture directly ahead and behind — geometrically accurate</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Lane markings in front and rear zones — sharp and correctly positioned</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Distance rings calibrated to real metres within 2cm precision</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Camera seams blend smoothly with no visible hard transition lines</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="half col">
+      <div class="card card-a"><div class="cl cl-a">Fundamental IPM Limitations</div>
+        <div class="col mt6" style="gap:7px;">
+          <div class="pc"><div class="dot dot-a"></div><p class="bsm"><strong style="color:var(--text);">Side lane blur:</strong> Lanes 4–6m lateral are seen at ~10° above horizontal. 1px fisheye error = ~50cm ground error. Not fixable without AI or depth sensors — this is a physics constraint.</p></div>
+          <div class="pc"><div class="dot dot-a"></div><p class="bsm"><strong style="color:var(--text);">3D object warping:</strong> Other cars, walls, pedestrians appear stretched because IPM assumes Y=0. Their actual height above ground is projected as if they were flat.</p></div>
+          <div class="pc"><div class="dot dot-r"></div><p class="bsm"><strong style="color:var(--text);">Car body artifact:</strong> Side cameras project the ego vehicle's own body into the BEV. Mitigated by the dark car box overlay. Fundamental to all camera-only IPM.</p></div>
+        </div>
+      </div>
+      <div class="card card-t mt8"><div class="cl cl-t">Next Steps</div>
+        <div class="col mt6" style="gap:5px;">
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Multi-thread with Kotlin coroutines — parallel per-camera passes → target &lt;1 second</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Real-time camera feed via Android Camera2 API or AAOS EVS</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">F2BEV neural network refinement pass for side-lane artifact correction</p></div>
+          <div class="pc"><div class="dot dot-g"></div><p class="bsm">Port to AAOS with EVS camera access for in-vehicle production deployment</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>The side lane blur is not a bug — it's physics. At 6m lateral, the camera sees ground at less than 10° elevation. One pixel maps to ~50cm of ground. No software tuning fixes this without depth information.</p></div>
+</div>
+
+<!-- S18 OUTRO -->
+<div class="slide-wrap" id="sw18"><div class="slide">
+<div class="gb"></div>
+<div class="gs" style="width:480px;height:480px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(0,229,200,.05) 0%,transparent 55%);"></div>
+<div class="abl abl-t"></div>
+<div class="sc" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:36px 20px;">
+  <span class="chip ct">Open Source · March 2026</span>
+  <div class="dh dh-xl" style="max-width:580px;">Built from<br><span class="ht">scratch.</span><br><span style="color:var(--text3);">Pure geometry.</span></div>
+  <p class="bmd" style="max-width:500px;">No server. No neural network at runtime. Just camera calibration, rotation matrices, and the Mei fisheye model — running on commodity Android hardware.</p>
+  <div style="font-family:var(--mono);font-size:clamp(11px,1.4vw,15px);color:var(--teal);background:rgba(0,229,200,.08);border:1px solid rgba(0,229,200,.2);border-radius:8px;padding:11px 26px;">https://github.com/HassanTarek-AppraidTech/Android-BEV-App</div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center;">
+    <span class="chip ct">arXiv:2303.03651</span><span class="chip cb">Jetson Nano · Android TV</span><span class="chip cp">FB-SSEM Dataset</span><span class="chip ca">Appraid Tech Project</span>
+  </div>
+</div>
+</div>
+<div class="notes"><h4>Speaker notes</h4><p>Hold this slide for 5 seconds. The GitHub link is in the video description. The docs/ folder contains the full algorithm flowchart, animated walkthrough, and this slide deck.</p></div>
+</div>
+
+</div><!-- stage -->
+<script>
+const LABELS=['Cover','What is Android','App Structure','AAOS','Platform Comparison','Project Intro','Methodology','Hardware & Calibration','BEV Canvas','IPM Concept','Rotation Matrix','Mei Fisheye Model','Blend Weight + Bilinear','Accumulation & Assembly','Overlay','MainActivity','Results & Limitations','Outro'];
+const T=18;let cur=1;
+const tw=document.getElementById('tocWrap');
+LABELS.forEach((l,i)=>{const b=document.createElement('button');b.className='tc'+(i===0?' cur':'');b.id='tc'+(i+1);b.textContent=(i+1)+'. '+l;b.onclick=()=>jump(i+1);tw.appendChild(b);});
+function jump(n){document.getElementById('sw'+cur).classList.remove('on');document.getElementById('tc'+cur).classList.remove('cur');cur=n;document.getElementById('sw'+cur).classList.add('on');document.getElementById('tc'+cur).classList.add('cur');document.getElementById('nc').textContent=cur+' / '+T;document.getElementById('pf').style.width=((cur/T)*100)+'%';document.getElementById('nb').textContent=cur<T?'Next →':'Finish';window.scrollTo({top:0,behavior:'smooth'});}
+function go(d){const n=cur+d;if(n>=1&&n<=T)jump(n);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);});
+document.getElementById('pf').style.width=((1/T)*100)+'%';
+</script>
+</body>
+</html>

@@ -18,11 +18,11 @@ The entire pipeline runs in pure Kotlin on the Jetson Nano CPU. There are no Pyt
 
 | Front | Left |
 |---|---|
-| ![Front](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/front/0.png) | ![Left](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/left/0.png) |
+| ![Front](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/blob/master/app/src/main/assets/bev_images/front/0.png) | ![Left](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/blob/master/app/src/main/assets/bev_images/left/0.png) |
 
 | Rear | Right |
 |---|---|
-| ![Rear](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/rear/0.png) | ![Right](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/right/0.png) |
+| ![Rear](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/blob/master/app/src/main/assets/bev_images/rear/0.png) | ![Right](https://github.com/HassanTarek-AppraidTech/Android-BEV-App/blob/master/app/src/main/assets/bev_images/right/0.png) |
 
 ---
 ## Output

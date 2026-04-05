@@ -73,8 +73,8 @@ Android-BEV-App/
 │   ├── index.html                     ← landing page 18-slide engineering presentation (GitHub Pages)
 │   ├── appraid_bev_system_flowchart.jpg
 │   ├── bev_animated_flowchart.html    ← Full pipeline flowchart
-│   ├── bev_output.png                 ← sample output for README
-│ 
+│   ├── bev_output.png                 ← output image
+│   ├── ground_truth.png               
 │
 ├── gradle/
 │   ├── wrapper/

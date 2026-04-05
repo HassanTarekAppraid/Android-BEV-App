@@ -90,8 +90,8 @@ Android-BEV-App/
 │   ├── appraid_bev_system_flowchart.jpg
 │   ├── bev_animated_flowchart.html    ← Full pipeline flowchart
 │   ├── bev_output.png                 ← output image
-│   ├── ground_truth.png               
-│
+│   ├── ground_truth.png              
+│   ├── UI.png                         ← Real-time Android interface running on Jetson Nano
 ├── gradle/
 │   ├── wrapper/
 │   │   ├── gradle-wrapper.jar

@@ -14,6 +14,27 @@ The entire pipeline runs in pure Kotlin on the Jetson Nano CPU. There are no Pyt
 
 ---
 
+## Input
+
+<p align="center">
+  <b>Front</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Left</b>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/front/0.png" width="45%" />
+  <img src="https://raw.githubusercontent.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/left/0.png" width="45%" />
+</p>
+
+<p align="center">
+  <b>Rear</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Right</b>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/rear/0.png" width="45%" />
+  <img src="https://raw.githubusercontent.com/HassanTarek-AppraidTech/Android-BEV-App/main/app/src/main/assets/bev_images/right/0.png" width="45%" />
+</p>
+
+---
 ## Output
 
 | BEV Output | Ground Truth (FB-SSEM dataset) |

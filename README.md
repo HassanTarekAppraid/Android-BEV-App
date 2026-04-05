@@ -2,7 +2,7 @@
 
 > Pure-Kotlin surround-view stitching from four fisheye cameras, running entirely on a Jetson Nano with Android TV. No server. No neural network at runtime. No GPU required.
 
-**Part of the Appraid Project · March 2026**
+**Part of the Appraid Tech Project · March 2026**
 
 ---
 
